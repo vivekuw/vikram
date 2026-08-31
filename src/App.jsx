@@ -100,9 +100,8 @@ export default function App() {
         onResetProgress={resetProgress}
       />
 
-      {/* Auxiliary Overlays (Minimap, Scanner, Controls, Debug) */}
+      {/* Auxiliary Overlays (Scanner, Controls, Debug) */}
       <div className="ui-layer">
-        {settings.showMinimap && <Minimap telemetry={telemetry} />}
         {settings.showScanner && !isScannerDisabled && (
           <HazardScanner
             telemetry={telemetry}

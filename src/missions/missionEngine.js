@@ -1,7 +1,7 @@
 import { OBJECTIVE_TYPES } from './missionTypes';
 import { MISSIONS } from './missionData';
 
-const SAVE_KEY = 'chandrayaan3_mission_save_v1';
+const SAVE_KEY = 'chandrayaan3_mission_save_v2';
 
 /**
  * Real-time objective evaluator engine.
@@ -118,7 +118,7 @@ export function evaluateObjectives(telemetry, mission) {
  */
 export function getDefaultSaveData() {
   return {
-    version: 1,
+    version: 2,
     unlockedMissions: ['mission-1'],
     stats: {
       'mission-1': {
@@ -138,7 +138,7 @@ export function loadSaveData() {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return getDefaultSaveData();
     const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object' || parsed.version !== 1) {
+    if (!parsed || typeof parsed !== 'object' || parsed.version !== 2) {
       return getDefaultSaveData();
     }
     return parsed;

@@ -25,25 +25,6 @@ export function AttitudeIndicator({ telemetry }) {
 
   return (
     <div className="hud-panel attitude-panel">
-      <div className="hud-panel-header">
-        <div className="hud-panel-title">
-          <Compass size={14} color={statusColor} />
-          <span>ATTITUDE TILT</span>
-        </div>
-        <span
-          className="attitude-status-tag"
-          style={{
-            color: statusColor,
-            backgroundColor: `${statusColor}18`,
-            borderColor: `${statusColor}50`,
-          }}
-        >
-          {status === 'SAFE' && <CheckCircle2 size={11} />}
-          {status !== 'SAFE' && <AlertTriangle size={11} />}
-          {status}
-        </span>
-      </div>
-
       <div className="attitude-body">
         {/* Visual Spacecraft Attitude Horizon Graphic */}
         <div className="attitude-graphic-container">

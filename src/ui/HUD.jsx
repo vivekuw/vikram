@@ -11,6 +11,8 @@ import { CenterReticle } from './CenterReticle';
 import { SettingsPanel } from './SettingsPanel';
 import { Pause, Play, Settings, RotateCcw, ArrowLeft } from 'lucide-react';
 
+import { Minimap } from './Minimap';
+
 /**
  * Main Spacecraft Mission Control HUD component (Stage 7C & Stage 8D)
  * Wraps telemetry modules, real-time objectives, and header actions around the 3D scene.
@@ -104,6 +106,21 @@ export function HUD({
         </div>
       </header>
 
+      {/* TOP PANEL: LANDING TARGET GUIDANCE */}
+      {!disableGuidance ? (
+        <div className="top-guidance-container interactive">
+          <LandingGuidance telemetry={telemetry} />
+        </div>
+      ) : (
+        <div className="top-guidance-container interactive">
+          <div className="hud-panel guidance-panel disabled-guidance">
+            <div className="manual-mode-warning">
+              ⚠ GUIDANCE COMPUTER DISABLED (MANUAL MODE)
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* PAUSE OVERLAY BANNER (Stage 7O) */}
       {isPaused && (
         <div className="pause-overlay-banner interactive">
@@ -132,28 +149,15 @@ export function HUD({
           )}
         </div>
 
-        {/* RIGHT COLUMN: FUEL & THRUST */}
+        {/* RIGHT COLUMN: FUEL, THRUST & MINIMAP RADAR */}
         <div className="hud-col hud-col-right interactive">
           <FuelGauge telemetry={telemetry} />
           <ThrustMeter telemetry={telemetry} />
+          {settings.showMinimap && (
+            <Minimap telemetry={telemetry} />
+          )}
         </div>
       </div>
-
-      {/* BOTTOM BAR: ATTITUDE, LANDING GUIDANCE, MISSION STATUS */}
-      <footer className="hud-footer interactive">
-        <AttitudeIndicator telemetry={telemetry} />
-        {!disableGuidance ? (
-          <LandingGuidance telemetry={telemetry} />
-        ) : (
-          <div className="hud-panel guidance-panel disabled-guidance">
-            <div className="hud-panel-title">LANDING GUIDANCE</div>
-            <div className="manual-mode-warning">
-              ⚠ GUIDANCE COMPUTER DISABLED (MANUAL MODE)
-            </div>
-          </div>
-        )}
-        <MissionStatus telemetry={telemetry} />
-      </footer>
 
       {/* SETTINGS PANEL MODAL */}
       {isSettingsOpen && (

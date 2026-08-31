@@ -31,13 +31,13 @@ export function MissionSelect({ saveData, onSelectMission, onResetProgress }) {
       {/* MAIN CONTENT TITLE */}
       <div className="select-hero">
         <h2>SELECT MISSION</h2>
-        <p>Complete training descents, fuel management, hazard avoidance, and precision landings to reach Shiv Shakti point.</p>
+        <p>Execute a controlled soft descent and touchdown on the lunar surface with Vikram Lander.</p>
       </div>
 
       {/* MISSIONS GRID */}
       <div className="missions-grid">
         {MISSIONS.map((mission) => {
-          const isUnlocked = unlockedMissions.includes(mission.id);
+          const isUnlocked = unlockedMissions.includes(mission.id) || true;
           const missionStat = stats[mission.id] || {};
           const { completed = false, bestScore = 0, bestStars = 0, attempts = 0 } = missionStat;
           const difficulty = mission.difficulty;
@@ -51,6 +51,11 @@ export function MissionSelect({ saveData, onSelectMission, onResetProgress }) {
               {/* CARD HEADER */}
               <div className="card-top">
                 <div className="mission-num-badge">MISSION 0{mission.number}</div>
+                {mission.number === 1 && (
+                  <span className="default-mission-tag" style={{ color: '#60a5fa', borderColor: 'rgba(59, 130, 246, 0.5)', backgroundColor: 'rgba(30, 58, 138, 0.4)', fontSize: '10px', padding: '2px 6px', borderRadius: '4px', border: '1px solid', fontWeight: 700, letterSpacing: '0.5px' }}>
+                    DEFAULT
+                  </span>
+                )}
                 <div className="difficulty-badge" style={{ color: difficulty.color, borderColor: `${difficulty.color}50` }}>
                   {difficulty.label}
                 </div>

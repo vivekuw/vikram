@@ -1,5 +1,5 @@
-import React from 'react';
-import { Camera, Radio, RotateCcw, Terminal, ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Radar, Eye } from 'lucide-react';
+import React, { useState } from 'react';
+import { Camera, Radio, RotateCcw, Terminal, ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Radar, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 
 export function ControlsOverlay({
   cameraMode,
@@ -13,6 +13,8 @@ export function ControlsOverlay({
   toggleScannerMode,
   setControlState,
 }) {
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
   const toggleCamera = () => {
     setCameraMode((prev) => {
       if (prev === 'chase' || prev === 'follow') return 'wide';
@@ -39,43 +41,41 @@ export function ControlsOverlay({
   if (cameraMode === 'wide') cameraLabel = 'WIDE VIEW';
   if (cameraMode === 'landing') cameraLabel = 'LANDING VIEW';
 
+  if (isCollapsed) {
+    return (
+      <div className="controls-collapsed-bar interactive">
+        <button className="controls-toggle-btn" onClick={() => setIsCollapsed(false)}>
+          <Radio size={14} color="var(--accent-cyan)" />
+          <span>FLIGHT CONTROLS & CAM</span>
+          <ChevronUp size={14} />
+        </button>
+      </div>
+    );
+  }
+
   return (
     <>
-      {/* Top Header Bar */}
-      <div className="mission-header interactive">
-        <div className="mission-title">
-          <span className="isro-badge">ISRO</span>
-          <div className="title-text">
-            <h1>Chandrayaan-3</h1>
-            <p>Stage 6 — Realistic Vikram 3D Model</p>
-          </div>
-        </div>
-        <div className="status-badge">
-          <span className="status-dot"></span>
-          <span>PHYSICS DESCENT SIMULATION ACTIVE</span>
-        </div>
-      </div>
-
       {/* Bottom Right Controls & Camera Box */}
       <div className="controls-panel interactive">
-        <div className="controls-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="controls-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', width: '100%' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Radio size={14} color="var(--accent-cyan)" />
-            <span>Flight Controls</span>
+            <span
+              style={{
+                fontSize: '10px',
+                fontFamily: 'var(--font-mono)',
+                color: 'var(--accent-cyan)',
+                background: 'rgba(0, 229, 255, 0.1)',
+                border: '1px solid rgba(0, 229, 255, 0.3)',
+                padding: '1px 6px',
+                borderRadius: '4px',
+              }}
+            >
+              {cameraLabel}
+            </span>
+            <button className="icon-collapse-btn" onClick={() => setIsCollapsed(true)} title="Collapse controls">
+              <ChevronDown size={14} />
+            </button>
           </div>
-          <span
-            style={{
-              fontSize: '10px',
-              fontFamily: 'var(--font-mono)',
-              color: 'var(--accent-cyan)',
-              background: 'rgba(0, 229, 255, 0.1)',
-              border: '1px solid rgba(0, 229, 255, 0.3)',
-              padding: '1px 6px',
-              borderRadius: '4px',
-            }}
-          >
-            {cameraLabel}
-          </span>
         </div>
 
         <div className="keys-grid">
@@ -103,9 +103,6 @@ export function ControlsOverlay({
 
         {/* Full 3D Flight Control D-Pad */}
         <div className="dpad-container">
-          <div style={{ fontSize: '10px', color: 'var(--accent-cyan)', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' }}>
-            3D Directional Control
-          </div>
           <div className="dpad-row">
             <button
               className="dpad-btn"
