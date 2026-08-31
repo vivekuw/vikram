@@ -8,7 +8,7 @@ import { useEffect, useRef } from 'react';
  * @param {Function} onToggleCamera - Callback when 'C' key is pressed
  * @param {Function} onToggleDebug - Callback when 'F3' or 'D' debug key is pressed
  */
-export function useControls({ onReset, onToggleCamera, onToggleDebug, onToggleScanner, onToggleInspect, onTogglePause }) {
+export function useControls({ onReset, onToggleCamera, onToggleDebug, onToggleScanner, onToggleInspect, onTogglePause, enabled = true }) {
   const keysPressed = useRef({
     w: false,
     s: false,
@@ -19,6 +19,10 @@ export function useControls({ onReset, onToggleCamera, onToggleDebug, onToggleSc
   });
 
   useEffect(() => {
+    if (!enabled) {
+      keysPressed.current = { w: false, s: false, a: false, d: false, q: false, e: false };
+      return;
+    }
     const handleKeyDown = (e) => {
       const key = e.key.toLowerCase();
       const code = e.code;

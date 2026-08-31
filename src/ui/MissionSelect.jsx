@@ -6,8 +6,8 @@ import { Play, Lock, Star, Rocket, ShieldCheck, Trophy, RotateCcw } from 'lucide
  * Mission Selection Menu screen (Stage 8A & 8J)
  * Displays available missions grid with difficulty badges, unlock statuses, best scores, and star ratings.
  */
-export function MissionSelect({ saveData, onSelectMission, onResetProgress }) {
-  const { unlockedMissions = [], stats = {} } = saveData;
+export function MissionSelect({ saveData = {}, onSelectMission, onResetProgress }) {
+  const { unlockedMissions = [], stats = {} } = saveData || {};
 
   return (
     <div className="mission-select-screen">

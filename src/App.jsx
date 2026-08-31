@@ -1,14 +1,20 @@
 import React from 'react';
 import { GameScene } from './scenes/GameScene';
+import { RoverMissionScene } from './scenes/RoverMissionScene';
 import { HUD } from './ui/HUD';
+import { RoverHUD } from './ui/RoverHUD';
+import { SciencePanel } from './ui/SciencePanel';
+import { RoverMap } from './ui/RoverMap';
 import { ControlsOverlay } from './ui/ControlsOverlay';
 import { DebugOverlay } from './ui/DebugOverlay';
 import { HazardScanner } from './ui/HazardScanner';
-import { Minimap } from './ui/Minimap';
 import { MissionSelect } from './ui/MissionSelect';
 import { MissionBriefing } from './ui/MissionBriefing';
 import { MissionResult } from './ui/MissionResult';
+import { Mission2Result } from './ui/Mission2Result';
+
 import { useLanderState } from './game/useLanderState';
+import { useRoverState, ROVER_STATES } from './rover/useRoverState';
 import { MISSION_STATES } from './missions/missionTypes';
 import { MISSIONS } from './missions/missionData';
 
@@ -47,6 +53,8 @@ export default function App() {
     nextMission,
   } = useLanderState();
 
+  const rover = useRoverState();
+
   const isScannerDisabled = activeMission?.restrictions?.disableScanner ?? false;
   const currentIndex = MISSIONS.findIndex((m) => m.id === activeMission?.id);
   const hasNextMission = currentIndex >= 0 && currentIndex < MISSIONS.length - 1;
@@ -74,7 +82,78 @@ export default function App() {
     );
   }
 
-  // 3. ACTIVE GAMEPLAY & RESULT STATES
+  // 3. MISSION 2: PRAGYAN ROVER EXPLORATION GAMEPLAY
+  if (activeMission?.number === 2) {
+    const isRoverComplete = rover.roverState === ROVER_STATES.MISSION_COMPLETE;
+    const isRoverFailed = rover.roverState === ROVER_STATES.MISSION_FAILED;
+
+    return (
+      <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+        {/* 3D R3F Rover Exploration Scene */}
+        <RoverMissionScene
+          roverRef={rover.roverRef}
+          roverState={rover.roverState}
+          deploymentProgress={rover.deploymentProgress}
+          cameraMode={rover.cameraMode}
+          updateRoverFrame={rover.updateRoverFrame}
+          triggerScienceInteract={rover.triggerScienceInteract}
+          cycleCamera={rover.cycleCamera}
+          toggleMap={rover.toggleMap}
+          togglePause={rover.togglePause}
+          restartMission2={rover.restartMission2}
+        />
+
+        {/* 2D Pragyan Rover Control HUD Overlay */}
+        <RoverHUD
+          roverRef={rover.roverRef}
+          roverState={rover.roverState}
+          objectivesStatus={rover.objectivesStatus}
+          missionTime={rover.missionTime}
+          cameraMode={rover.cameraMode}
+          cycleCamera={rover.cycleCamera}
+          toggleMap={rover.toggleMap}
+          triggerScienceInteract={rover.triggerScienceInteract}
+          isPaused={rover.isPaused}
+          togglePause={rover.togglePause}
+          restartMission2={rover.restartMission2}
+          onReturnToMenu={returnToMenu}
+        />
+
+        {/* Interactive Science Payload Instrument Modal (Target B) */}
+        {rover.isScienceOpen && (
+          <SciencePanel
+            activeResult={rover.activeScienceResult}
+            onRunInstrument={rover.runSciencePayload}
+            onClose={rover.closeScienceModal}
+          />
+        )}
+
+        {/* Fullsurface Navigation Minimap Modal */}
+        {rover.isMapOpen && (
+          <RoverMap
+            roverRef={rover.roverRef}
+            objectivesStatus={rover.objectivesStatus}
+            onClose={rover.toggleMap}
+          />
+        )}
+
+        {/* Mission 2 Result Modal (SUCCESS / FAILURE) */}
+        {(isRoverComplete || isRoverFailed) && (
+          <Mission2Result
+            isSuccess={isRoverComplete}
+            failureReason={rover.failureReason}
+            objectivesStatus={rover.objectivesStatus}
+            roverRef={rover.roverRef}
+            missionTime={rover.missionTime}
+            onRetry={rover.restartMission2}
+            onReturnToMenu={returnToMenu}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // 4. MISSION 1: VIKRAM LANDING GAMEPLAY & RESULT STATES
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
       {/* 3D WebGL Canvas Layer */}

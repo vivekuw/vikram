@@ -202,6 +202,7 @@ export function useLanderState() {
     onToggleScanner: toggleScannerMode,
     onToggleInspect: toggleInspectMode,
     onTogglePause: togglePause,
+    enabled: activeMission?.number === 1,
   });
 
   // Per-frame physics tick handler

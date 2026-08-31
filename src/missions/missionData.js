@@ -1,7 +1,8 @@
 import { OBJECTIVE_TYPES, DIFFICULTY_LEVELS } from './missionTypes';
 
 /**
- * Single Mission Configuration for Chandrayaan-3 Vikram Lander Simulator
+ * Mission Configurations for Chandrayaan-3 Simulator
+ * ONLY TWO MISSIONS: Mission 1 (Vikram Landing) & Mission 2 (Pragyan Exploration)
  */
 export const MISSIONS = [
   {
@@ -45,6 +46,46 @@ export const MISSIONS = [
         label: 'Descent speed ≤ 4.0 m/s',
         targetValue: 4.0,
         mandatory: false,
+      },
+    ],
+  },
+  {
+    id: 'mission-2',
+    number: 2,
+    title: 'PRAGYAN ROVER EXPLORATION',
+    briefingTitle: 'CHANDRAYAAN-3 ROVER SURVIVAL & SCIENCE',
+    description: 'Deploy Pragyan from Vikram, manage battery resources, navigate lunar hazards, perform LIBS/APXS science analysis at Target B, explore Target C, and return safely to Vikram.',
+    difficulty: DIFFICULTY_LEVELS.HARD,
+    startingBatteryPercent: 100,
+    restrictions: {
+      disableScanner: false,
+      disableGuidance: false,
+    },
+    objectives: [
+      {
+        id: 'obj-2-1',
+        label: 'Deploy Pragyan onto lunar surface',
+        mandatory: true,
+      },
+      {
+        id: 'obj-2-2',
+        label: 'Reach Navigation Target A',
+        mandatory: true,
+      },
+      {
+        id: 'obj-2-3',
+        label: 'Analyze Science Target B (LIBS & APXS)',
+        mandatory: true,
+      },
+      {
+        id: 'obj-2-4',
+        label: 'Reach Final Target C',
+        mandatory: true,
+      },
+      {
+        id: 'obj-2-5',
+        label: 'Return Pragyan safely to Vikram Lander',
+        mandatory: true,
       },
     ],
   },
