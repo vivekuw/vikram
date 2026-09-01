@@ -44,20 +44,38 @@ export function RoverHUD({
     commColor = '#ff9100';
   }
 
-  // Active Target Information
+  // Active Target Information & World Position
   let activeTargetLabel = 'TARGET A (NAV)';
+  let activeTargetPos = ROVER_CONSTANTS.TARGET_A_POSITION;
   let activeTargetDist = Math.hypot(rx - ROVER_CONSTANTS.TARGET_A_POSITION.x, rz - ROVER_CONSTANTS.TARGET_A_POSITION.z).toFixed(1);
 
   if (objectivesStatus.targetADone && !objectivesStatus.targetBDone) {
     activeTargetLabel = 'TARGET B (SCIENCE)';
+    activeTargetPos = ROVER_CONSTANTS.TARGET_B_POSITION;
     activeTargetDist = Math.hypot(rx - ROVER_CONSTANTS.TARGET_B_POSITION.x, rz - ROVER_CONSTANTS.TARGET_B_POSITION.z).toFixed(1);
   } else if (objectivesStatus.targetBDone && !objectivesStatus.targetCDone) {
     activeTargetLabel = 'TARGET C (EXPLORE)';
+    activeTargetPos = ROVER_CONSTANTS.TARGET_C_POSITION;
     activeTargetDist = Math.hypot(rx - ROVER_CONSTANTS.TARGET_C_POSITION.x, rz - ROVER_CONSTANTS.TARGET_C_POSITION.z).toFixed(1);
   } else if (objectivesStatus.targetCDone && !objectivesStatus.returnedToVikram) {
     activeTargetLabel = 'RETURN TO VIKRAM';
+    activeTargetPos = { x: 0, z: 0 };
     activeTargetDist = distVikram;
   }
+
+  // Calculate Relative Target Angle for Compass Guidance Pointer
+  const dx = activeTargetPos.x - rx;
+  const dz = activeTargetPos.z - rz;
+  const targetAngleWorld = Math.atan2(dx, dz);
+  let relAngle = targetAngleWorld - heading;
+  while (relAngle > Math.PI) relAngle -= Math.PI * 2;
+  while (relAngle < -Math.PI) relAngle += Math.PI * 2;
+  const relativeTargetDeg = relAngle * (180 / Math.PI);
+
+  let targetDirLabel = 'AHEAD ▲';
+  if (relativeTargetDeg > 45 && relativeTargetDeg <= 135) targetDirLabel = 'RIGHT ►';
+  else if (relativeTargetDeg < -45 && relativeTargetDeg >= -135) targetDirLabel = 'LEFT ◄';
+  else if (Math.abs(relativeTargetDeg) > 135) targetDirLabel = 'BEHIND ▼';
 
   const isNearScienceTarget = objectivesStatus.targetADone && !objectivesStatus.targetBDone && Number(activeTargetDist) <= 8.0;
 
@@ -68,60 +86,39 @@ export function RoverHUD({
   else if (deg > 135 && deg <= 225) cardinalDir = 'S';
   else if (deg > 225 && deg <= 315) cardinalDir = 'W';
 
+  const cameraModeLabels = {
+    chase: 'CHASE (BEHIND)',
+    top: 'TOP (OVERHEAD)',
+    front: 'FRONT (FORWARD VIEW)',
+    science: 'SCIENCE (FOCUS)',
+  };
+
   return (
     <div className="mission-hud-container interactive">
-      {/* TOP HEADER BAR */}
-      <header className="hud-header">
-        <div className="hud-header-left">
-          {onReturnToMenu && (
-            <button className="hud-action-btn menu-back-btn" onClick={onReturnToMenu}>
-              <ArrowLeft size={14} /> MENU
-            </button>
-          )}
-          <div className="isro-flag-badge">ISRO</div>
-          <div className="mission-title-box">
-            <h1>MISSION 02 — PRAGYAN ROVER EXPLORATION</h1>
-            <p>CHANDRAYAAN-3 LUNAR ROVER SURVIVAL & SCIENCE</p>
-          </div>
-        </div>
-
-        <div className="hud-header-center">
-          <div className="mission-timer-box">
-            <span className="timer-label">MISSION TIMER</span>
-            <span className="timer-value">{missionTime}</span>
-          </div>
-        </div>
-
-        <div className="hud-header-right">
-          {cycleCamera && (
-            <button className="hud-action-btn" onClick={cycleCamera} title="Cycle Camera Mode (C)">
-              <span>🎥 {cameraMode.toUpperCase()} [C]</span>
-            </button>
-          )}
-          {toggleMap && (
-            <button className="hud-action-btn" onClick={toggleMap} title="Toggle Surface Map (M)">
-              <span>🗺️ MAP [M]</span>
-            </button>
-          )}
-          <button className="hud-action-btn pause-btn" onClick={togglePause}>
-            {isPaused ? <Play size={15} color="#00e676" /> : <Pause size={15} color="var(--accent-gold)" />}
-            <span>{isPaused ? 'RESUME [P]' : 'PAUSE [P]'}</span>
-          </button>
-          <button className="hud-action-btn reset-btn" onClick={restartMission2}>
-            <RotateCcw size={15} />
-            <span>RESET [R]</span>
-          </button>
-        </div>
-      </header>
-
       {/* TOP TARGET GUIDANCE BANNER */}
       <div className="top-guidance-container">
-        <div className="hud-panel guidance-panel" style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div className="hud-panel guidance-panel" style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-cyan)', fontWeight: 800, fontSize: '11px' }}>
-            <Target size={14} /> {activeTargetLabel}
+            <Target size={15} color="var(--accent-cyan)" /> {activeTargetLabel}
           </div>
           <div style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-gold)', fontSize: '13px', fontWeight: 800 }}>
             {activeTargetDist} <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>m</span>
+          </div>
+          {/* Target Relative Bearing Indicator Arrow */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            background: 'rgba(0, 229, 255, 0.15)',
+            border: '1px solid rgba(0, 229, 255, 0.4)',
+            padding: '3px 8px',
+            borderRadius: '4px',
+            fontSize: '11px',
+            fontWeight: 800,
+            color: '#00e5ff',
+          }}>
+            <Navigation size={12} style={{ transform: `rotate(${relativeTargetDeg}deg)`, transition: 'transform 0.1s ease' }} />
+            <span>{targetDirLabel}</span>
           </div>
           <div style={{ fontSize: '10px', color: commColor, fontWeight: 700, border: `1px solid ${commColor}40`, padding: '2px 6px', borderRadius: '4px', background: `${commColor}15` }}>
             <Radio size={11} style={{ marginRight: '4px' }} /> {commStatus}
@@ -203,11 +200,49 @@ export function RoverHUD({
             </div>
           </div>
 
+          {/* TYRE SPIN & WHEEL SLIP TELEMETRY */}
+          <div className="hud-panel">
+            <div className="hud-panel-header">
+              <div className="hud-panel-title">
+                <RotateCcw size={14} color={(current.slipRatio || 0) > 0.35 ? '#ff1744' : '#00e5ff'} />
+                <span>TYRE SPIN & TRACTION</span>
+              </div>
+              <span
+                style={{
+                  fontSize: '9px',
+                  fontFamily: 'var(--font-mono)',
+                  color: (current.slipRatio || 0) > 0.4 ? '#ff1744' : (current.slipRatio || 0) > 0.15 ? '#ffd700' : '#00e676',
+                  fontWeight: 800,
+                  border: `1px solid ${(current.slipRatio || 0) > 0.4 ? '#ff174440' : '#00e67640'}`,
+                  padding: '1px 5px',
+                  borderRadius: '3px',
+                  background: 'rgba(0,0,0,0.4)',
+                }}
+              >
+                {(current.slipRatio || 0) > 0.4 ? 'HEAVY SPIN' : (current.slipRatio || 0) > 0.15 ? 'REGOLITH SLIP' : 'FULL GRIP'}
+              </span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '4px' }}>
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '6px 8px', borderRadius: '6px' }}>
+                <div style={{ fontSize: '9px', color: 'var(--text-muted)' }}>WHEEL SPIN RPM</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '15px', fontWeight: 800, color: '#00e5ff' }}>
+                  {Math.abs((((current.tyreSpinSpeed || 0) * 60) / (Math.PI * 2))).toFixed(0)} <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>RPM</span>
+                </div>
+              </div>
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '6px 8px', borderRadius: '6px' }}>
+                <div style={{ fontSize: '9px', color: 'var(--text-muted)' }}>TYRE SLIP %</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '15px', fontWeight: 800, color: (current.slipRatio || 0) > 0.35 ? '#ff1744' : '#ffd700' }}>
+                  {((current.slipRatio || 0) * 100).toFixed(0)}%
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* ROVER DEBUG OVERLAY */}
           <div className="hud-panel" style={{ fontSize: '10px', fontFamily: 'var(--font-mono)' }}>
             <div className="hud-panel-header" style={{ marginBottom: '4px' }}>
               <span style={{ color: 'var(--accent-gold)', fontWeight: 800 }}>ROVER DEBUG</span>
-              <span style={{ color: 'var(--accent-cyan)' }}>CAM: {cameraMode.toUpperCase()}</span>
+              <span style={{ color: 'var(--accent-cyan)' }}>{cameraModeLabels[cameraMode] || cameraMode.toUpperCase()}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', color: 'var(--text-muted)' }}>
               <div>POS: X={rx.toFixed(1)} Y={position[1].toFixed(1)} Z={rz.toFixed(1)}</div>
@@ -239,6 +274,50 @@ export function RoverHUD({
           <RoverMinimapWidget roverRef={roverRef} objectivesStatus={objectivesStatus} />
         </div>
       </div>
+
+      {/* BOTTOM HEADER BAR */}
+      <header className="hud-header" style={{ marginTop: 'auto' }}>
+        <div className="hud-header-left">
+          {onReturnToMenu && (
+            <button className="hud-action-btn menu-back-btn" onClick={onReturnToMenu}>
+              <ArrowLeft size={14} /> MENU
+            </button>
+          )}
+          <div className="isro-flag-badge">ISRO</div>
+          <div className="mission-title-box">
+            <h1>MISSION 02 — PRAGYAN ROVER EXPLORATION</h1>
+            <p>CHANDRAYAAN-3 LUNAR ROVER SURVIVAL & SCIENCE</p>
+          </div>
+        </div>
+
+        <div className="hud-header-center">
+          <div className="mission-timer-box">
+            <span className="timer-label">MISSION TIMER</span>
+            <span className="timer-value">{missionTime}</span>
+          </div>
+        </div>
+
+        <div className="hud-header-right">
+          {cycleCamera && (
+            <button className="hud-action-btn" onClick={cycleCamera} title="Cycle Camera Mode (C)">
+              <span>🎥 {cameraModeLabels[cameraMode] || cameraMode.toUpperCase()} [C]</span>
+            </button>
+          )}
+          {toggleMap && (
+            <button className="hud-action-btn" onClick={toggleMap} title="Toggle Surface Map (M)">
+              <span>🗺️ MAP [M]</span>
+            </button>
+          )}
+          <button className="hud-action-btn pause-btn" onClick={togglePause}>
+            {isPaused ? <Play size={15} color="#00e676" /> : <Pause size={15} color="var(--accent-gold)" />}
+            <span>{isPaused ? 'RESUME [P]' : 'PAUSE [P]'}</span>
+          </button>
+          <button className="hud-action-btn reset-btn" onClick={restartMission2}>
+            <RotateCcw size={15} />
+            <span>RESET [R]</span>
+          </button>
+        </div>
+      </header>
     </div>
   );
 }

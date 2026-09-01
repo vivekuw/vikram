@@ -17,10 +17,16 @@ export function ControlsOverlay({
 
   const toggleCamera = () => {
     setCameraMode((prev) => {
-      if (prev === 'chase' || prev === 'follow') return 'wide';
+      if (prev === 'chase' || prev === 'follow') return 'spot';
+      if (prev === 'spot' || prev === 'target') return 'top_down';
+      if (prev === 'top_down') return 'wide';
       if (prev === 'wide') return 'landing';
       return 'chase';
     });
+  };
+
+  const setSpotCamera = () => {
+    setCameraMode('spot');
   };
 
   const toggleDebug = () => {
@@ -38,15 +44,17 @@ export function ControlsOverlay({
   };
 
   let cameraLabel = 'CHASE VIEW';
+  if (cameraMode === 'spot' || cameraMode === 'target') cameraLabel = '🎯 LANDING SPOT VIEW';
+  if (cameraMode === 'top_down') cameraLabel = 'TOP-DOWN VIEW';
   if (cameraMode === 'wide') cameraLabel = 'WIDE VIEW';
-  if (cameraMode === 'landing') cameraLabel = 'LANDING VIEW';
+  if (cameraMode === 'landing') cameraLabel = 'LANDING FEET VIEW';
 
   if (isCollapsed) {
     return (
       <div className="controls-collapsed-bar interactive">
         <button className="controls-toggle-btn" onClick={() => setIsCollapsed(false)}>
           <Radio size={14} color="var(--accent-cyan)" />
-          <span>FLIGHT CONTROLS & CAM</span>
+          <span>FLIGHT CONTROLS & CAM ({cameraLabel})</span>
           <ChevronUp size={14} />
         </button>
       </div>
@@ -63,11 +71,12 @@ export function ControlsOverlay({
               style={{
                 fontSize: '10px',
                 fontFamily: 'var(--font-mono)',
-                color: 'var(--accent-cyan)',
-                background: 'rgba(0, 229, 255, 0.1)',
-                border: '1px solid rgba(0, 229, 255, 0.3)',
-                padding: '1px 6px',
+                color: cameraMode === 'spot' ? '#00e5ff' : 'var(--accent-cyan)',
+                background: cameraMode === 'spot' ? 'rgba(0, 229, 255, 0.2)' : 'rgba(0, 229, 255, 0.1)',
+                border: '1px solid rgba(0, 229, 255, 0.4)',
+                padding: '2px 8px',
                 borderRadius: '4px',
+                fontWeight: 800,
               }}
             >
               {cameraLabel}
@@ -88,8 +97,8 @@ export function ControlsOverlay({
           <span className="key-badge">Q / E</span>
           <span className="key-desc">Steer Forward / Back (↑ / ↓)</span>
 
-          <span className="key-badge">C</span>
-          <span className="key-desc">Cycle Camera (Chase/Wide/Land)</span>
+          <span className="key-badge">C / T</span>
+          <span className="key-desc">Cycle Camera / 🎯 Landing Spot View</span>
 
           <span className="key-badge">H</span>
           <span className="key-desc">Hazard Scanner HUD</span>
@@ -176,10 +185,81 @@ export function ControlsOverlay({
           </div>
         </div>
 
+        {/* Camera Preset Toolbar */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', margin: '6px 0 2px 0' }}>
+          <button
+            className="camera-btn"
+            style={{
+              background: cameraMode === 'spot' || cameraMode === 'target' ? 'linear-gradient(135deg, #00e5ff 0%, #0088ff 100%)' : 'rgba(0, 229, 255, 0.12)',
+              color: cameraMode === 'spot' || cameraMode === 'target' ? '#000' : '#00e5ff',
+              borderColor: '#00e5ff',
+              fontWeight: 900,
+              padding: '5px 4px',
+              fontSize: '10px',
+              borderRadius: '5px',
+            }}
+            onClick={() => setCameraMode('spot')}
+            title="Dual View: Frames both Satellite & Target Spot [T]"
+          >
+            🎯 DUAL VIEW [T]
+          </button>
+
+          <button
+            className="camera-btn"
+            style={{
+              background: cameraMode === 'top_down' ? 'linear-gradient(135deg, #ffd700 0%, #ff8f00 100%)' : 'rgba(255, 215, 0, 0.12)',
+              color: cameraMode === 'top_down' ? '#000' : '#ffd700',
+              borderColor: '#ffd700',
+              fontWeight: 900,
+              padding: '5px 4px',
+              fontSize: '10px',
+              borderRadius: '5px',
+            }}
+            onClick={() => setCameraMode('top_down')}
+            title="Top-Down Overhead View"
+          >
+            ⬇️ TOP-DOWN
+          </button>
+
+          <button
+            className="camera-btn"
+            style={{
+              background: cameraMode === 'chase' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.08)',
+              color: '#ffffff',
+              borderColor: 'rgba(255, 255, 255, 0.3)',
+              fontWeight: 800,
+              padding: '5px 4px',
+              fontSize: '10px',
+              borderRadius: '5px',
+            }}
+            onClick={() => setCameraMode('chase')}
+            title="Chase View behind spacecraft"
+          >
+            🚁 CHASE CAM
+          </button>
+
+          <button
+            className="camera-btn"
+            style={{
+              background: cameraMode === 'wide' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.08)',
+              color: '#ffffff',
+              borderColor: 'rgba(255, 255, 255, 0.3)',
+              fontWeight: 800,
+              padding: '5px 4px',
+              fontSize: '10px',
+              borderRadius: '5px',
+            }}
+            onClick={() => setCameraMode('wide')}
+            title="Wide Panoramic Overview"
+          >
+            🌐 WIDE VIEW
+          </button>
+        </div>
+
         <div style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
           <button className="camera-btn" style={{ flex: 1 }} onClick={toggleCamera} title="Cycle Camera Views (C)">
             <Camera size={14} />
-            <span>Cam ({cameraMode.toUpperCase()})</span>
+            <span>Cycle Cam [C]</span>
           </button>
 
           <button

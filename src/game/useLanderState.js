@@ -62,7 +62,7 @@ export function useLanderState() {
     showMinimap: true,
     showScanner: false,
     showReticle: true,
-    cameraMode: 'chase', // 'chase' | 'wide' | 'landing'
+    cameraMode: 'spot', // Default Dual View: Frames both Satellite Lander and Target Landing Spot
     units: 'Metric',
   });
 

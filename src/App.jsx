@@ -93,6 +93,7 @@ export default function App() {
         <RoverMissionScene
           roverRef={rover.roverRef}
           roverState={rover.roverState}
+          objectivesStatus={rover.objectivesStatus}
           deploymentProgress={rover.deploymentProgress}
           cameraMode={rover.cameraMode}
           updateRoverFrame={rover.updateRoverFrame}

@@ -48,7 +48,7 @@ export function useControls({ onReset, onToggleCamera, onToggleDebug, onToggleSc
       if (key === 'r' && onReset) {
         onReset();
       }
-      if (key === 'c' && onToggleCamera) {
+      if ((key === 'c' || key === 't') && onToggleCamera) {
         onToggleCamera();
       }
       if (key === 'h' && onToggleScanner) {

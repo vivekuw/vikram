@@ -95,9 +95,26 @@ export function stepRoverPhysics(state, inputs, dt) {
   const slopeAngle = Math.atan2(heightDiff, sampleDist) * (180 / Math.PI);
   const isClimbingSlope = slopeAngle > 2.0;
 
-  // 6. Visual Wheel Rotation Angle (proportional to velocity * dt)
+  // 6. Tyre Slip, Steering Angle & Wheel Spin Dynamics
+  let steerAngle = 0;
+  if (left) steerAngle = 0.42; // ~24 deg turn left
+  if (right) steerAngle = -0.42; // ~24 deg turn right
+
+  // Calculate Wheel Slip Ratio (0 to 100%)
+  let slipRatio = 0;
+  if (forward || backward) {
+    // Heavy throttle at low speed causes initial tyre slip on lunar regolith
+    const throttleSlip = Math.max(0, 0.35 - Math.abs(newVel) * 0.2);
+    // Steep slopes cause wheel slip
+    const slopeSlip = Math.max(0, (Math.abs(slopeAngle) - 5) * 0.025);
+    slipRatio = Math.min(0.95, throttleSlip + slopeSlip);
+  }
+
+  // Visual Wheel Rotation Angle (includes tyre spin slip factor)
   const distTraveled = Math.abs(newVel * dt);
-  const newWheelAngle = (wheelAngle + (newVel * dt) / ROVER_CONSTANTS.WHEEL_RADIUS) % (Math.PI * 2);
+  const slipMultiplier = 1.0 + slipRatio * 2.2; // Wheel spins up to 3.2x faster during slip
+  const tyreSpinSpeed = (newVel / ROVER_CONSTANTS.WHEEL_RADIUS) * slipMultiplier;
+  const newWheelAngle = (wheelAngle + tyreSpinSpeed * dt) % (Math.PI * 2);
 
   // 7. Hazard Tipping Check
   const isTippedOver = Math.abs(slopeAngle) > ROVER_CONSTANTS.SLOPE_TIPPING_THRESHOLD;
@@ -109,9 +126,12 @@ export function stepRoverPhysics(state, inputs, dt) {
     heading: newHeading,
     forwardVector: [fx, 0, fz],
     wheelAngle: newWheelAngle,
+    steerAngle,
+    slipRatio,
+    tyreSpinSpeed,
     slopeAngle: Math.abs(slopeAngle),
     isClimbingSlope,
-    isDriving: Math.abs(newVel) > 0.01,
+    isDriving: Math.abs(newVel) > 0.01 || slipRatio > 0.1,
     isTurning,
     distTraveled,
     collisionStatus: isTippedOver ? 'IMMOBILIZED' : Math.abs(slopeAngle) > 20 ? 'WARNING' : 'SAFE',

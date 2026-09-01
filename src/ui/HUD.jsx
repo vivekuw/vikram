@@ -55,57 +55,6 @@ export function HUD({
       {/* CENTER RETICLE */}
       {settings.showReticle && <CenterReticle telemetry={telemetry} />}
 
-      {/* TOP HEADER BAR */}
-      <header className="hud-header interactive">
-        <div className="hud-header-left">
-          {onReturnToMenu && (
-            <button className="hud-action-btn menu-back-btn" onClick={onReturnToMenu} title="Return to Mission Select">
-              <ArrowLeft size={14} /> MENU
-            </button>
-          )}
-          <div className="isro-flag-badge">ISRO</div>
-          <div className="mission-title-box">
-            <h1>{activeMission ? `MISSION 0${activeMission.number} — ${activeMission.title}` : 'CHANDRAYAAN-3'}</h1>
-            <p>{activeMission ? activeMission.briefingTitle : 'VIKRAM LANDER DESCENT SIMULATOR'}</p>
-          </div>
-        </div>
-
-        <div className="hud-header-center">
-          <div className="mission-timer-box">
-            <span className="timer-label">MISSION TIMER</span>
-            <span className="timer-value">{missionTime}</span>
-          </div>
-        </div>
-
-        <div className="hud-header-right">
-          <button
-            className="hud-action-btn pause-btn"
-            onClick={togglePause}
-            title="Pause / Resume (P)"
-          >
-            {isPaused ? <Play size={15} color="#00e676" /> : <Pause size={15} color="var(--accent-gold)" />}
-            <span>{isPaused ? 'RESUME [P]' : 'PAUSE [P]'}</span>
-          </button>
-
-          <button
-            className="hud-action-btn reset-btn"
-            onClick={resetSimulation}
-            title="Restart Mission (R)"
-          >
-            <RotateCcw size={15} />
-            <span>RESET [R]</span>
-          </button>
-
-          <button
-            className="hud-action-btn settings-btn"
-            onClick={() => setIsSettingsOpen(true)}
-            title="Simulator Settings"
-          >
-            <Settings size={15} />
-          </button>
-        </div>
-      </header>
-
       {/* TOP PANEL: LANDING TARGET GUIDANCE */}
       {!disableGuidance ? (
         <div className="top-guidance-container interactive">
@@ -158,6 +107,57 @@ export function HUD({
           )}
         </div>
       </div>
+
+      {/* BOTTOM HEADER BAR */}
+      <header className="hud-header interactive" style={{ marginTop: 'auto' }}>
+        <div className="hud-header-left">
+          {onReturnToMenu && (
+            <button className="hud-action-btn menu-back-btn" onClick={onReturnToMenu} title="Return to Mission Select">
+              <ArrowLeft size={14} /> MENU
+            </button>
+          )}
+          <div className="isro-flag-badge">ISRO</div>
+          <div className="mission-title-box">
+            <h1>{activeMission ? `MISSION 0${activeMission.number} — ${activeMission.title}` : 'CHANDRAYAAN-3'}</h1>
+            <p>{activeMission ? activeMission.briefingTitle : 'VIKRAM LANDER DESCENT SIMULATOR'}</p>
+          </div>
+        </div>
+
+        <div className="hud-header-center">
+          <div className="mission-timer-box">
+            <span className="timer-label">MISSION TIMER</span>
+            <span className="timer-value">{missionTime}</span>
+          </div>
+        </div>
+
+        <div className="hud-header-right">
+          <button
+            className="hud-action-btn pause-btn"
+            onClick={togglePause}
+            title="Pause / Resume (P)"
+          >
+            {isPaused ? <Play size={15} color="#00e676" /> : <Pause size={15} color="var(--accent-gold)" />}
+            <span>{isPaused ? 'RESUME [P]' : 'PAUSE [P]'}</span>
+          </button>
+
+          <button
+            className="hud-action-btn reset-btn"
+            onClick={resetSimulation}
+            title="Restart Mission (R)"
+          >
+            <RotateCcw size={15} />
+            <span>RESET [R]</span>
+          </button>
+
+          <button
+            className="hud-action-btn settings-btn"
+            onClick={() => setIsSettingsOpen(true)}
+            title="Simulator Settings"
+          >
+            <Settings size={15} />
+          </button>
+        </div>
+      </header>
 
       {/* SETTINGS PANEL MODAL */}
       {isSettingsOpen && (

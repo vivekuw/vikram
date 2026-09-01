@@ -3,6 +3,7 @@ import { ROVER_CONSTANTS } from './roverConstants';
 import { stepRoverPhysics } from './roverPhysics';
 import { consumeDrivingBattery, consumeTurningBattery, consumeScienceBattery, getBatteryStatus } from './roverBattery';
 import { executeScienceInstrument } from '../science/scienceEngine';
+import { soundEngine } from '../game/soundEngine';
 
 export const ROVER_STATES = {
   VIKRAM_LANDED: 'VIKRAM_LANDED',
@@ -179,6 +180,7 @@ export function useRoverState() {
 
   // Execute LIBS or APXS
   const runSciencePayload = useCallback((instrumentType) => {
+    soundEngine.playLaserSound();
     const result = executeScienceInstrument(instrumentType);
     setActiveScienceResult(result);
 
