@@ -55,20 +55,7 @@ export function HUD({
       {/* CENTER RETICLE */}
       {settings.showReticle && <CenterReticle telemetry={telemetry} />}
 
-      {/* TOP PANEL: LANDING TARGET GUIDANCE */}
-      {!disableGuidance ? (
-        <div className="top-guidance-container interactive">
-          <LandingGuidance telemetry={telemetry} />
-        </div>
-      ) : (
-        <div className="top-guidance-container interactive">
-          <div className="hud-panel guidance-panel disabled-guidance">
-            <div className="manual-mode-warning">
-              ⚠ GUIDANCE COMPUTER DISABLED (MANUAL MODE)
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* PAUSE OVERLAY BANNER (Stage 7O) */}
       {isPaused && (
@@ -86,8 +73,17 @@ export function HUD({
 
       {/* MAIN HUD PANELS GRID */}
       <div className="hud-panels-grid">
-        {/* LEFT COLUMN: ALTITUDE & VELOCITY & REAL-TIME OBJECTIVES */}
+        {/* LEFT COLUMN: GUIDANCE, ALTITUDE & VELOCITY & REAL-TIME OBJECTIVES */}
         <div className="hud-col hud-col-left interactive">
+          {!disableGuidance ? (
+            <LandingGuidance telemetry={telemetry} />
+          ) : (
+            <div className="hud-panel guidance-panel disabled-guidance">
+              <div className="manual-mode-warning">
+                ⚠ GUIDANCE COMPUTER DISABLED (MANUAL MODE)
+              </div>
+            </div>
+          )}
           <AltitudeIndicator telemetry={telemetry} />
           <VelocityIndicator telemetry={telemetry} />
           {activeMission && (
