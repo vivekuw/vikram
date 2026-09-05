@@ -25,7 +25,7 @@ export const ROTATION_DAMPING = 3.5;        // Spring damping back to center
 export const LATERAL_THRUST_ACCEL = 4.5;    // Lateral RCS acceleration (m/s²)
 
 // Initial Simulation Spawn State
-export const INITIAL_POSITION = [0, 250.0, 0]; // Initial altitude 250 meters
+export const INITIAL_POSITION = [0, 180.0, 0]; // Initial altitude 180 meters
 export const INITIAL_VELOCITY = [0, -2.0, 0];  // Initial slight descent speed -2.0 m/s
 export const INITIAL_ROTATION = [0, 0, 0];
 

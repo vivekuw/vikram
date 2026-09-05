@@ -28,30 +28,29 @@ export function CameraController({ landerRef, cameraMode = 'spot' }) {
     const dist3D = Math.hypot(px - targetX, py - targetY, pz - targetZ);
 
     if (cameraMode === 'spot' || cameraMode === 'target') {
-      // DUAL VIEW: Camera is ALWAYS positioned above the lander satellite height (py + 45)
-      // to guarantee that both the Lander (satellite) and Landing Spot are 100% visible!
-      const requiredCamDist = Math.max(60, dist3D * 1.15 + 25);
+      // DUAL VIEW: Camera positioned to frame BOTH 180m Spacecraft Satellite and Target Pad on screen!
+      const requiredCamDist = Math.max(65, dist3D * 1.25 + 30);
 
       const camX = midX - 25;
-      const camY = Math.max(py + 40, groundY + 45); // ALWAYS higher than Lander height py!
+      const camY = Math.max(py + 30, groundY + 40); // Higher than lander for optimal perspective
       const camZ = midZ + requiredCamDist;
 
       targetPos.current.set(camX, camY, camZ);
-      lookAtPos.current.set(midX, Math.max(1.0, py * 0.35), midZ);
+      lookAtPos.current.set(midX, Math.max(5.0, midY * 0.95), midZ);
     } else if (cameraMode === 'top_down') {
-      // TOP-DOWN OVERHEAD: Positioned high directly above midpoint between Satellite & Landing Spot
-      targetPos.current.set(midX, Math.max(90, py + 60), midZ);
-      lookAtPos.current.set(midX, 0, midZ);
+      // TOP-DOWN OVERHEAD: High vertical perspective directly framing Satellite & Landing Spot
+      targetPos.current.set(midX, Math.max(120, py + 80), midZ);
+      lookAtPos.current.set(midX, midY * 0.5, midZ);
     } else if (cameraMode === 'chase' || cameraMode === 'follow') {
-      // CHASE: Behind & above Vikram, angled toward the Landing Spot
-      const requiredCamDist = Math.max(45, dist3D * 0.8 + 20);
-      targetPos.current.set(px - 10, Math.max(py + 18, groundY + 12), pz + requiredCamDist);
-      lookAtPos.current.set(midX, Math.max(1.0, py * 0.35), midZ);
+      // CHASE: Behind & above Spacecraft Satellite, angled toward the Landing Spot
+      const requiredCamDist = Math.max(45, dist3D * 0.85 + 25);
+      targetPos.current.set(px - 12, Math.max(py + 15, groundY + 12), pz + requiredCamDist);
+      lookAtPos.current.set(midX, Math.max(5.0, py * 0.6 + midY * 0.35), midZ);
     } else if (cameraMode === 'wide') {
-      // PANORAMIC WIDE VIEW: Wide orbital perspective framing Lander & Target Pad
-      const requiredCamDist = Math.max(55, dist3D * 1.1 + 25);
-      targetPos.current.set(midX + 45, Math.max(groundY + 25, midY + 45), midZ + requiredCamDist);
-      lookAtPos.current.set(midX, Math.max(1.0, midY * 0.4), midZ);
+      // PANORAMIC WIDE VIEW: Wide orbital perspective framing Satellite & Target Pad
+      const requiredCamDist = Math.max(60, dist3D * 1.2 + 30);
+      targetPos.current.set(midX + 50, Math.max(groundY + 30, midY + 45), midZ + requiredCamDist);
+      lookAtPos.current.set(midX, Math.max(5.0, midY * 0.85), midZ);
     } else if (cameraMode === 'landing') {
       // LANDING FEET CLOSE-UP: Close to Lander feet but angled toward Landing Spot
       targetPos.current.set(px, Math.max(groundY + 2.5, py + 4), pz + 14);

@@ -58,7 +58,7 @@ function GroundShadowProjection({ landerRef }) {
           <bufferAttribute
             attach="attributes-position"
             count={4}
-            array={new Float32Array([0, 250, 0, 0, 0, 0, 0, 0, 0, 35, 0.1, 0])}
+            array={new Float32Array([0, 180, 0, 0, 0, 0, 0, 0, 0, 35, 0.1, 0])}
             itemSize={3}
           />
         </bufferGeometry>
@@ -125,14 +125,14 @@ export function GameScene({ landerRef, telemetry, cameraMode, isInspectMode, upd
     <div className="canvas-container">
       <Canvas
         shadows
-        camera={{ position: [0, 95, 30], fov: 50, near: 0.1, far: 1000 }}
+        camera={{ position: [0, 95, 30], fov: 50, near: 0.1, far: 2500 }}
         gl={{ antialias: true, alpha: false }}
       >
         {/* Deep Space Background Color */}
         <color attach="background" args={['#04060d']} />
 
         {/* Clear Atmospheric Fog (Far distance to prevent hiding high altitude objects) */}
-        <fog attach="fog" args={['#04060d', 450, 2000]} />
+        <fog attach="fog" args={['#04060d', 800, 4000]} />
 
         {/* --- ENHANCED CRISP LIGHTING --- */}
         <ambientLight intensity={0.55} color="#b0bec5" />

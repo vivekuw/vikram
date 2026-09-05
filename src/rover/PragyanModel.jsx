@@ -82,38 +82,20 @@ function ProceduralPragyanRover({ wheelAngle = 0, steerAngle = 0 }) {
       ))}
 
       {/* ================= FRONT IDENTIFICATION & BUMPER (-Z) ================= */}
-      {/* Front High-Contrast Cyan Bumper Bar */}
+      {/* Front Metallic Bumper Bar */}
       <mesh position={[0, 0.0, -0.42]}>
-        <boxGeometry args={[0.74, 0.08, 0.05]} />
-        <meshStandardMaterial color="#00e5ff" metalness={0.9} roughness={0.1} />
+        <boxGeometry args={[0.74, 0.06, 0.04]} />
+        <meshStandardMaterial color="#455a64" metalness={0.9} roughness={0.2} />
       </mesh>
 
       {/* Dual Glowing Front Headlamp Lenses */}
-      <mesh position={[-0.2, 0.05, -0.44]}>
-        <boxGeometry args={[0.12, 0.08, 0.04]} />
+      <mesh position={[-0.2, 0.05, -0.43]}>
+        <boxGeometry args={[0.10, 0.06, 0.03]} />
         <meshBasicMaterial color="#ffffff" />
       </mesh>
-      <mesh position={[0.2, 0.05, -0.44]}>
-        <boxGeometry args={[0.12, 0.08, 0.04]} />
+      <mesh position={[0.2, 0.05, -0.43]}>
+        <boxGeometry args={[0.10, 0.06, 0.03]} />
         <meshBasicMaterial color="#ffffff" />
-      </mesh>
-
-      {/* Front Volumetric Light Beam Cone */}
-      <mesh position={[0, -0.05, -1.2]} rotation={[Math.PI / 2, 0, 0]}>
-        <coneGeometry args={[0.8, 1.5, 16]} />
-        <meshBasicMaterial color="#00e5ff" transparent opacity={0.15} depthWrite={false} />
-      </mesh>
-
-      {/* High-Visibility Roof Forward Arrow ("▲ FRONT") */}
-      <mesh position={[0, 0.22, -0.2]} rotation={[-Math.PI / 2, 0, 0]}>
-        <coneGeometry args={[0.18, 0.35, 3]} />
-        <meshBasicMaterial color="#00e5ff" />
-      </mesh>
-
-      {/* Ground Projection Arrow (-Z) showing Forward Direction */}
-      <mesh position={[0, -0.28, -0.7]} rotation={[-Math.PI / 2, 0, 0]}>
-        <coneGeometry args={[0.3, 0.6, 3]} />
-        <meshBasicMaterial color="#00e5ff" transparent opacity={0.65} side={2} />
       </mesh>
 
       {/* ================= SENSOR MAST & APXS ARM (FRONT -Z) ================= */}
@@ -233,6 +215,12 @@ function ProceduralPragyanRover({ wheelAngle = 0, steerAngle = 0 }) {
           </group>
         );
       })}
+
+      {/* Soft Subtle Chassis Ground Contact Shadow */}
+      <mesh position={[0, -0.28, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[0.9, 1.1]} />
+        <meshBasicMaterial color="#050811" transparent opacity={0.35} depthWrite={false} />
+      </mesh>
     </group>
   );
 }

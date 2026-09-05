@@ -91,7 +91,7 @@ export function Minimap({ telemetry }) {
     }
 
     // 4. Draw Vikram Lander Position 🛸 V
-    const [px, , pz] = telemetry.position || [0, 250, 0];
+    const [px, , pz] = telemetry.position || [0, 180, 0];
     const vx = toCanvasX(px);
     const vz = toCanvasY(pz);
 

@@ -16,7 +16,7 @@ export function Lander({ landerRef, actualThrustRatio = 0, isInspectMode = false
     }
   });
 
-  const [px, , pz] = landerRef.current?.position || [0, 250, 0];
+  const [px, , pz] = landerRef.current?.position || [0, 180, 0];
   const groundY = getTerrainHeight(px, pz);
 
   return (

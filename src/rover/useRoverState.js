@@ -24,7 +24,7 @@ export function useRoverState() {
 
   // Synchronous Physical State Ref
   const roverRef = useRef({
-    position: [0, 0.35, 2.5], // Spawns near Vikram (0,0)
+    position: [0, 0.285, 2.5], // Spawns near Vikram (0,0)
     velocity: 0,
     heading: Math.PI, // Facing South (-Z ➔ +Z)
     wheelAngle: 0,

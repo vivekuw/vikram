@@ -10,9 +10,9 @@ export const MISSIONS = [
     number: 1,
     title: 'VIKRAM LANDER TOUCHDOWN',
     briefingTitle: 'CHANDRAYAAN-3 LUNAR LANDING MISSION',
-    description: 'Perform a controlled descent from 200m altitude and execute a soft touchdown inside the designated lunar landing zone.',
+    description: 'Perform a controlled descent from 180m altitude and execute a soft touchdown inside the designated lunar landing zone.',
     difficulty: DIFFICULTY_LEVELS.NORMAL,
-    startingAltitude: 200,
+    startingAltitude: 180,
     startingFuelPercent: 100,
     landingZoneRadius: 15,
     restrictions: {

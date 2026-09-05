@@ -23,6 +23,26 @@ function GLTFModel({ actualThrustRatio, ...props }) {
 
   return (
     <group scale={[LANDER_SCALE, LANDER_SCALE, LANDER_SCALE]} {...props}>
+      {/* Floating 3D Satellite Label in Sky */}
+      <Html position={[0, 3.5, 0]} center style={{ pointerEvents: 'none' }}>
+        <div
+          style={{
+            background: 'rgba(5, 15, 35, 0.92)',
+            border: '2px solid #ffd700',
+            color: '#ffd700',
+            padding: '4px 10px',
+            borderRadius: '6px',
+            fontFamily: 'monospace',
+            fontWeight: 900,
+            fontSize: '11px',
+            whiteSpace: 'nowrap',
+            boxShadow: '0 0 15px rgba(255, 215, 0, 0.6)',
+            letterSpacing: '0.5px',
+          }}
+        >
+          🛸 VIKRAM SATELLITE
+        </div>
+      </Html>
       <primitive object={clonedScene} />
       {/* Thruster Flame Engine Effect */}
       <EngineEffect actualThrustRatio={actualThrustRatio} />

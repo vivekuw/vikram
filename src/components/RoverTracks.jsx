@@ -77,10 +77,10 @@ export function RoverTracks({ roverRef }) {
       </bufferGeometry>
       <pointsMaterial
         attach="material"
-        size={3.2}
-        color="#2c3545"
+        size={1.6}
+        color="#1a202c"
         transparent
-        opacity={0.7}
+        opacity={0.35}
         sizeAttenuation={true}
         depthWrite={false}
       />

@@ -88,7 +88,7 @@ export function useLanderState() {
 
   // Helper to re-spawn physics state from mission parameters
   const spawnMissionPhysics = useCallback((mission) => {
-    const startAlt = mission.startingAltitude ?? 250;
+    const startAlt = mission.startingAltitude ?? 180;
     const startFuelP = mission.startingFuelPercent ?? 100;
     const initialFuelMass = MAX_FUEL_MASS * (startFuelP / 100.0);
 

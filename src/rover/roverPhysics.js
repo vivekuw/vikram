@@ -82,11 +82,51 @@ export function stepRoverPhysics(state, inputs, dt) {
   const newX = x + fx * newVel * dt;
   const newZ = z + fz * newVel * dt;
 
-  // Sample terrain elevation at new position
-  const newGroundY = terrainEngine.getTerrainHeight(newX, newZ);
-  const newY = newGroundY + ROVER_CONSTANTS.ROVER_GROUND_CLEARANCE;
+  // Wheelbase (0.8m) & Track Width (0.8m)
+  const L = 0.8;
+  const W = 0.8;
+  const rxVec = Math.cos(newHeading);
+  const rzVec = -Math.sin(newHeading);
 
-  // 5. Terrain Slope Calculation (sampled over 2.0m wheelbase)
+  // Sample terrain elevation at 4 wheel contact corners to conform chassis to lunar contours
+  const flX = newX + fx * (L / 2) - rxVec * (W / 2);
+  const flZ = newZ + fz * (L / 2) - rzVec * (W / 2);
+  const y_fl = terrainEngine.getTerrainHeight(flX, flZ);
+
+  const frX = newX + fx * (L / 2) + rxVec * (W / 2);
+  const frZ = newZ + fz * (L / 2) + rzVec * (W / 2);
+  const y_fr = terrainEngine.getTerrainHeight(frX, frZ);
+
+  const rlX = newX - fx * (L / 2) - rxVec * (W / 2);
+  const rlZ = newZ - fz * (L / 2) - rzVec * (W / 2);
+  const y_rl = terrainEngine.getTerrainHeight(rlX, rlZ);
+
+  const rrX = newX - fx * (L / 2) + rxVec * (W / 2);
+  const rrZ = newZ - fz * (L / 2) + rzVec * (W / 2);
+  const y_rr = terrainEngine.getTerrainHeight(rrX, rrZ);
+
+  const y_front = (y_fl + y_fr) / 2;
+  const y_rear = (y_rl + y_rr) / 2;
+  const y_left = (y_fl + y_rl) / 2;
+  const y_right = (y_fr + y_rr) / 2;
+  const newGroundY = (y_fl + y_fr + y_rl + y_rr) / 4;
+
+  // Calculate terrain pitch (front-to-back tilt) and roll (left-to-right tilt)
+  const targetPitch = Math.atan2(y_front - y_rear, L);
+  const targetRoll = Math.atan2(y_right - y_left, W);
+
+  // Smooth lerp pitch and roll to prevent jerky movement on sharp rocks
+  const prevPitch = state.pitch || 0;
+  const prevRoll = state.roll || 0;
+  const pitch = prevPitch + (targetPitch - prevPitch) * Math.min(1.0, dt * 12.0);
+  const roll = prevRoll + (targetRoll - prevRoll) * Math.min(1.0, dt * 12.0);
+
+  // Micro suspension bounce while driving on rough regolith
+  const totalDist = (state.totalDist || 0) + Math.abs(newVel * dt);
+  const suspensionBounce = Math.abs(newVel) > 0.02 ? Math.sin(totalDist * 28.0) * 0.006 * (Math.abs(newVel) / ROVER_CONSTANTS.MAX_SPEED) : 0;
+  const newY = newGroundY + ROVER_CONSTANTS.ROVER_GROUND_CLEARANCE + suspensionBounce;
+
+  // 5. Terrain Slope Calculation
   const sampleDist = 2.0;
   const aheadX = newX + fx * sampleDist;
   const aheadZ = newZ + fz * sampleDist;
@@ -124,6 +164,9 @@ export function stepRoverPhysics(state, inputs, dt) {
     position: [newX, newY, newZ],
     velocity: newVel,
     heading: newHeading,
+    pitch,
+    roll,
+    totalDist,
     forwardVector: [fx, 0, fz],
     wheelAngle: newWheelAngle,
     steerAngle,

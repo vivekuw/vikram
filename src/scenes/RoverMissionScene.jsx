@@ -65,9 +65,6 @@ export function RoverMissionScene({
         {/* Dynamic 3D Wheel Track Trails on Regolith */}
         <RoverTracks roverRef={roverRef} />
 
-        {/* Dynamic 3D Wheel Dust Particles */}
-        <RoverDustParticles roverRef={roverRef} />
-
         {/* Landed Vikram Lander at (0, vikramY, 0) */}
         <group position={[0, vikramY + 0.4, 0]}>
           <VikramModel />
@@ -118,53 +115,41 @@ export function RoverMissionScene({
   );
 }
 
-// High-Visibility Holographic 3D Laser Beacon & Floating Sky Marker (Anchored to Ground Terrain)
+// Elegant 3D Target Marker Beacon (Sleek Thin Ray & Sky Tag)
 function TargetBeacon({ position, color, label }) {
   return (
     <group position={position}>
-      {/* Ground Glowing Rings Sitting Flat on Regolith Surface */}
-      <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[2.5, 4.2, 32]} />
-        <meshBasicMaterial color={color} side={2} transparent opacity={0.85} />
+      {/* Sleek Ground Target Ring */}
+      <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[1.2, 1.5, 32]} />
+        <meshBasicMaterial color={color} side={2} transparent opacity={0.7} />
       </mesh>
       <mesh position={[0, 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[2.5, 32]} />
-        <meshBasicMaterial color={color} side={2} transparent opacity={0.3} />
+        <circleGeometry args={[1.2, 32]} />
+        <meshBasicMaterial color={color} side={2} transparent opacity={0.15} />
       </mesh>
 
-      {/* Outer Volumetric Halo Column */}
-      <mesh position={[0, 15, 0]}>
-        <cylinderGeometry args={[1.2, 1.2, 30, 16]} />
-        <meshBasicMaterial color={color} transparent opacity={0.22} depthWrite={false} />
+      {/* Sleek Thin Vertical Laser Ray */}
+      <mesh position={[0, 10, 0]}>
+        <cylinderGeometry args={[0.04, 0.04, 20, 8]} />
+        <meshBasicMaterial color={color} transparent opacity={0.5} />
       </mesh>
 
-      {/* Inner Intense Laser Core */}
-      <mesh position={[0, 15, 0]}>
-        <cylinderGeometry args={[0.35, 0.35, 30, 16]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.75} />
-      </mesh>
+      <pointLight position={[0, 1.5, 0]} color={color} intensity={4} distance={15} />
 
-      {/* Top Glowing Orb */}
-      <mesh position={[0, 30, 0]}>
-        <sphereGeometry args={[0.8, 16, 16]} />
-        <meshBasicMaterial color={color} />
-      </mesh>
-
-      <pointLight position={[0, 3, 0]} color={color} intensity={6} distance={25} />
-
-      {/* Floating 3D Text Tag in the Sky */}
-      <Html position={[0, 16, 0]} center style={{ pointerEvents: 'none' }}>
+      {/* Floating 3D Text Tag in Sky */}
+      <Html position={[0, 10, 0]} center style={{ pointerEvents: 'none' }}>
         <div style={{
           background: 'rgba(5, 12, 28, 0.95)',
           border: `2px solid ${color}`,
           color: color,
-          padding: '6px 12px',
-          borderRadius: '8px',
+          padding: '5px 10px',
+          borderRadius: '6px',
           fontFamily: 'system-ui, -apple-system, sans-serif',
-          fontSize: '13px',
-          fontWeight: 900,
+          fontSize: '12px',
+          fontWeight: 800,
           whiteSpace: 'nowrap',
-          boxShadow: `0 0 20px ${color}80, inset 0 0 10px ${color}40`,
+          boxShadow: `0 0 15px ${color}60`,
           pointerEvents: 'none',
           letterSpacing: '0.5px',
         }}>
@@ -183,6 +168,8 @@ function RoverLoop({ roverRef, roverState, deploymentProgress, cameraMode, keysR
   // Reusable THREE objects to prevent garbage collection per frame
   const targetCamPos = useRef(new THREE.Vector3());
   const lookTargetVec = useRef(new THREE.Vector3());
+  const targetQuaternion = useRef(new THREE.Quaternion());
+  const euler = useRef(new THREE.Euler(0, 0, 0, 'YXZ'));
 
   useFrame((_, delta) => {
     const dt = Math.min(delta, 0.1);
@@ -193,6 +180,8 @@ function RoverLoop({ roverRef, roverState, deploymentProgress, cameraMode, keysR
     const current = roverRef.current || {};
     const [rx, ry, rz] = current.position || [0, 0.35, 2.5];
     const heading = current.heading || Math.PI;
+    const pitch = current.pitch || 0;
+    const roll = current.roll || 0;
 
     // Update Motor Audio Pitch & Slip Sound
     soundEngine.updateMotorSound(current.velocity / 1.5 || 0, current.slipRatio || 0);
@@ -205,10 +194,12 @@ function RoverLoop({ roverRef, roverState, deploymentProgress, cameraMode, keysR
       roverRef.current.position = renderPos;
     }
 
-    // Move Rover 3D Mesh
+    // Orient and Position Rover 3D Mesh (Conforms to terrain contours: Pitch, Heading & Roll)
     if (roverGroupRef.current) {
       roverGroupRef.current.position.set(renderPos[0], renderPos[1], renderPos[2]);
-      roverGroupRef.current.rotation.y = heading + ROVER_CONSTANTS.MODEL_ROTATION_OFFSET;
+      euler.current.set(-pitch, heading + ROVER_CONSTANTS.MODEL_ROTATION_OFFSET, roll, 'YXZ');
+      targetQuaternion.current.setFromEuler(euler.current);
+      roverGroupRef.current.quaternion.slerp(targetQuaternion.current, Math.min(1.0, dt * 14.0));
     }
 
     // Single Unified Camera Controller System

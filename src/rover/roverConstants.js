@@ -20,7 +20,7 @@ export const ROVER_CONSTANTS = {
 
   // Physics & Terrain
   WHEEL_RADIUS: 0.25,       // m
-  ROVER_GROUND_CLEARANCE: 0.35, // m above terrain
+  ROVER_GROUND_CLEARANCE: 0.285, // m above terrain (flushes 6 wheels directly onto lunar surface)
   SLOPE_TIPPING_THRESHOLD: 42.0, // degrees (max slope before tipping)
 
   // Battery Level Thresholds (%)
