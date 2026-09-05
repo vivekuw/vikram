@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Trophy, Star, RotateCcw, ArrowLeft, CheckCircle2, AlertTriangle, BookOpen } from 'lucide-react';
 import { calculateMission2Score } from '../missions/mission2Scoring';
 import { CHANDRAYAAN3_FACTS } from '../data/chandrayaan3Facts';
+import { navigate, ROUTES } from '../game/router';
+import { saveScoreRecord } from '../game/leaderboard';
 
 export function Mission2Result({
   isSuccess,
@@ -21,6 +23,19 @@ export function Mission2Result({
     slopeMax: slope,
     isSuccess,
   });
+
+  useEffect(() => {
+    if (isSuccess && scoreResult) {
+      const payloadCount = objectivesStatus ? Object.values(objectivesStatus).filter((o) => o?.completed).length : 2;
+      saveScoreRecord('mission-2', {
+        score: scoreResult.totalScore,
+        stars: scoreResult.stars,
+        batteryRemaining: `${battery.toFixed(1)}%`,
+        sciencePayloads: `${payloadCount} / 3`,
+        timeElapsed: missionTime || '05:00',
+      });
+    }
+  }, [isSuccess, scoreResult, battery, objectivesStatus, missionTime]);
 
   return (
     <div className="pause-overlay-banner interactive">
@@ -99,6 +114,13 @@ export function Mission2Result({
         <div style={{ display: 'flex', gap: '10px', width: '100%', marginTop: '6px' }}>
           <button className="resume-action-btn" style={{ flex: 1, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)', color: '#fff' }} onClick={onReturnToMenu}>
             <ArrowLeft size={14} /> MENU
+          </button>
+          <button
+            className="resume-action-btn"
+            style={{ flex: 1, background: 'rgba(234, 179, 8, 0.2)', border: '1px solid rgba(234, 179, 8, 0.5)', color: '#eab308' }}
+            onClick={() => navigate(ROUTES.LEADERBOARD)}
+          >
+            <Trophy size={14} /> LEADERBOARD
           </button>
           <button className="resume-action-btn" style={{ flex: 1 }} onClick={onRetry}>
             <RotateCcw size={14} /> REPLAY MISSION 2
