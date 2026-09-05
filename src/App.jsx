@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { GameScene } from './scenes/GameScene';
 import { RoverMissionScene } from './scenes/RoverMissionScene';
 import { HUD } from './ui/HUD';
@@ -12,21 +12,13 @@ import { MissionSelect } from './ui/MissionSelect';
 import { MissionBriefing } from './ui/MissionBriefing';
 import { MissionResult } from './ui/MissionResult';
 import { Mission2Result } from './ui/Mission2Result';
-import { LeaderboardPage } from './ui/LeaderboardPage';
-import { CallsignModal } from './ui/CallsignModal';
 
 import { useLanderState } from './game/useLanderState';
 import { useRoverState, ROVER_STATES } from './rover/useRoverState';
 import { MISSION_STATES } from './missions/missionTypes';
 import { MISSIONS } from './missions/missionData';
-import { useRoute, navigate, ROUTES } from './game/router';
-import { getCommanderName } from './game/leaderboard';
 
 export default function App() {
-  const currentRoute = useRoute();
-  const [pendingMission, setPendingMission] = useState(null);
-  const [showCallsignModal, setShowCallsignModal] = useState(false);
-
   const {
     landerRef,
     telemetry,
@@ -56,33 +48,10 @@ export default function App() {
     analyticsReport,
     selectMission,
     startActiveMission,
-    returnToMenu: rawReturnToMenu,
+    returnToMenu,
     resetProgress,
     nextMission,
   } = useLanderState();
-
-  const handleReturnToMenu = () => {
-    rawReturnToMenu();
-    navigate(ROUTES.HOME);
-  };
-
-  const handleSelectMissionWithCallsignCheck = (mission) => {
-    const existingCallsign = getCommanderName();
-    if (!existingCallsign) {
-      setPendingMission(mission);
-      setShowCallsignModal(true);
-    } else {
-      selectMission(mission);
-    }
-  };
-
-  const handleConfirmCallsign = (callsign) => {
-    setShowCallsignModal(false);
-    if (pendingMission) {
-      selectMission(pendingMission);
-      setPendingMission(null);
-    }
-  };
 
   const rover = useRoverState();
 
@@ -90,41 +59,26 @@ export default function App() {
   const currentIndex = MISSIONS.findIndex((m) => m.id === activeMission?.id);
   const hasNextMission = currentIndex >= 0 && currentIndex < MISSIONS.length - 1;
 
-  // ROUTE 1: LEADERBOARD PAGE (/leaderboard)
-  if (currentRoute === ROUTES.LEADERBOARD) {
-    return <LeaderboardPage />;
-  }
-
-  // 1. MAIN MENU STATE (HOME ROUTE /)
+  // 1. MAIN MENU STATE
   if (missionState === MISSION_STATES.MENU) {
     return (
-      <>
-        <MissionSelect
-          saveData={saveData}
-          onSelectMission={handleSelectMissionWithCallsignCheck}
-          onResetProgress={resetProgress}
-        />
-        {showCallsignModal && (
-          <CallsignModal onConfirm={handleConfirmCallsign} />
-        )}
-      </>
+      <MissionSelect
+        saveData={saveData}
+        onSelectMission={selectMission}
+        onResetProgress={resetProgress}
+      />
     );
   }
 
   // 2. MISSION BRIEFING STATE
   if (missionState === MISSION_STATES.BRIEFING) {
     return (
-      <>
-        <MissionBriefing
-          mission={activeMission}
-          saveData={saveData}
-          onStartMission={startActiveMission}
-          onBack={handleReturnToMenu}
-        />
-        {showCallsignModal && (
-          <CallsignModal onConfirm={handleConfirmCallsign} />
-        )}
-      </>
+      <MissionBriefing
+        mission={activeMission}
+        saveData={saveData}
+        onStartMission={startActiveMission}
+        onBack={returnToMenu}
+      />
     );
   }
 
@@ -163,7 +117,7 @@ export default function App() {
           isPaused={rover.isPaused}
           togglePause={rover.togglePause}
           restartMission2={rover.restartMission2}
-          onReturnToMenu={handleReturnToMenu}
+          onReturnToMenu={returnToMenu}
         />
 
         {/* Interactive Science Payload Instrument Modal (Target B) */}
@@ -193,7 +147,7 @@ export default function App() {
             roverRef={rover.roverRef}
             missionTime={rover.missionTime}
             onRetry={rover.restartMission2}
-            onReturnToMenu={handleReturnToMenu}
+            onReturnToMenu={returnToMenu}
           />
         )}
       </div>
@@ -222,7 +176,7 @@ export default function App() {
         updateSettings={updateSettings}
         activeMission={activeMission}
         evaluatedObjectives={evaluatedObjectives}
-        onReturnToMenu={handleReturnToMenu}
+        onReturnToMenu={returnToMenu}
         onResetProgress={resetProgress}
       />
 
@@ -263,7 +217,7 @@ export default function App() {
           analyticsReport={analyticsReport}
           onNextMission={nextMission}
           onRetry={resetSimulation}
-          onReturnToMenu={handleReturnToMenu}
+          onReturnToMenu={returnToMenu}
           hasNextMission={hasNextMission}
         />
       )}

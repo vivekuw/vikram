@@ -1,7 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Trophy, Star, ArrowRight, RotateCcw, Menu, CheckCircle2, AlertOctagon, BarChart2 } from 'lucide-react';
-import { navigate, ROUTES } from '../game/router';
-import { saveScoreRecord } from '../game/leaderboard';
 
 /**
  * Post-Flight Mission Result Overlay component (Stage 8I & 8M)
@@ -17,18 +15,6 @@ export function MissionResult({
   onReturnToMenu,
   hasNextMission,
 }) {
-  useEffect(() => {
-    if (isSuccess && mission && scoreResult) {
-      saveScoreRecord('mission-1', {
-        score: scoreResult.totalScore,
-        stars: scoreResult.stars,
-        touchdownSpeed: analyticsReport?.touchdownVerticalSpeed || '1.5 m/s',
-        fuelRemaining: analyticsReport?.fuelRemainingPercent || '40.0%',
-        accuracy: analyticsReport?.landingAccuracyDistance || '5.0 m',
-      });
-    }
-  }, [isSuccess, mission, scoreResult, analyticsReport]);
-
   if (!mission || !scoreResult) return null;
 
   const { totalScore = 0, stars = 0, categories = {} } = scoreResult;
@@ -154,13 +140,6 @@ export function MissionResult({
         <div className="result-actions-row">
           <button className="result-btn menu-btn" onClick={onReturnToMenu}>
             <Menu size={15} /> MISSION MENU
-          </button>
-          <button
-            className="result-btn leaderboard-btn"
-            onClick={() => navigate(ROUTES.LEADERBOARD)}
-            style={{ backgroundColor: 'rgba(234, 179, 8, 0.2)', color: '#eab308', border: '1px solid rgba(234, 179, 8, 0.5)' }}
-          >
-            <Trophy size={15} /> LEADERBOARD
           </button>
           <button className="result-btn retry-btn" onClick={onRetry}>
             <RotateCcw size={15} /> RETRY

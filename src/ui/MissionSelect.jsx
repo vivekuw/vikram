@@ -2,8 +2,6 @@ import React from 'react';
 import { MISSIONS } from '../missions/missionData';
 import { Play, Lock, Star, Rocket, ShieldCheck, Trophy, RotateCcw } from 'lucide-react';
 
-import { navigate, ROUTES } from '../game/router';
-
 /**
  * Mission Selection Menu screen (Stage 8A & 8J)
  * Displays available missions grid with difficulty badges, unlock statuses, best scores, and star ratings.
@@ -23,27 +21,7 @@ export function MissionSelect({ saveData = {}, onSelectMission, onResetProgress 
           </div>
         </div>
 
-        <div className="select-header-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <button
-            className="leaderboard-nav-btn"
-            onClick={() => navigate(ROUTES.LEADERBOARD)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 14px',
-              backgroundColor: 'rgba(234, 179, 8, 0.15)',
-              border: '1px solid rgba(234, 179, 8, 0.5)',
-              borderRadius: '6px',
-              color: '#eab308',
-              fontSize: '12px',
-              fontWeight: '700',
-              cursor: 'pointer',
-              letterSpacing: '0.5px',
-            }}
-          >
-            <Trophy size={14} color="#eab308" /> LEADERBOARD
-          </button>
+        <div className="select-header-actions">
           <button className="reset-progress-btn" onClick={onResetProgress} title="Reset save progress">
             <RotateCcw size={13} /> RESET PROGRESS
           </button>
